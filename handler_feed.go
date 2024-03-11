@@ -10,9 +10,10 @@ import (
 	"github.com/harljos/rss_aggregator/internal/database"
 )
 
-func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, req *http.Request) {
+func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, req *http.Request, user database.User) {
 	type parameters struct {
 		Name string `json:"name"`
+		Url  string `json:"url"`
 	}
 
 	decoder := json.NewDecoder(req.Body)
@@ -23,20 +24,18 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	user, err := cfg.DB.CreateUser(req.Context(), database.CreateUserParams{
+	feed, err := cfg.DB.CreateFeed(req.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		Name:      params.Name,
+		Url:       params.Url,
+		UserID:    user.ID,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't create user %v", err))
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't create feed %v", err))
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, databaseUserToUser(user))
-}
-
-func (cfg *apiConfig) handlerGetUserByApiKey(w http.ResponseWriter, req *http.Request, user database.User) {
-	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
+	respondWithJSON(w, http.StatusCreated, databaseFeedToFeed(feed))
 }
