@@ -39,6 +39,16 @@ func (cfg *apiConfig) handlerCreateFeedFollow(w http.ResponseWriter, req *http.R
 	respondWithJSON(w, http.StatusCreated, databaseFeedFollowToFeedFollow(feedFollow))
 }
 
+func (cfg *apiConfig) handlerGetFeedFollowsForUser(w http.ResponseWriter, req *http.Request, user database.User) {
+	feedFollows, err := cfg.DB.GetFeedFollowsForUser(req.Context(), user.ID)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't get feed follows %v", err))
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, databaseFeedFollowsToFeedFollows(feedFollows))
+}
+
 func (cfg *apiConfig) handlerDeleteFeedFollow(w http.ResponseWriter, req *http.Request, user database.User) {
 	params := chi.URLParam(req, "feedFollowID")
 	feedFollowID, err := uuid.Parse(params)
