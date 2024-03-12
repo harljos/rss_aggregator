@@ -15,23 +15,6 @@ type User struct {
 	APIKey    string    `json:"api_key"`
 }
 
-type Feed struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Name      string    `json:"name"`
-	Url       string    `json:"url"`
-	UserID    uuid.UUID `json:"user_id"`
-}
-
-type FeedFollow struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time	`json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	UserID    uuid.UUID `json:"user_id"`
-	FeedID    uuid.UUID `json:"feed_id"`
-}
-
 func databaseUserToUser(dbUser database.User) User {
 	return User{
 		ID:        dbUser.ID,
@@ -42,14 +25,25 @@ func databaseUserToUser(dbUser database.User) User {
 	}
 }
 
+type Feed struct {
+	ID            uuid.UUID  `json:"id"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
+	Name          string     `json:"name"`
+	Url           string     `json:"url"`
+	UserID        uuid.UUID  `json:"user_id"`
+	LastFetchedAt *time.Time `json:"last_fetched_at"`
+}
+
 func databaseFeedToFeed(dbFeed database.Feed) Feed {
 	return Feed{
-		ID:        dbFeed.ID,
-		CreatedAt: dbFeed.CreatedAt,
-		UpdatedAt: dbFeed.UpdatedAt,
-		Name:      dbFeed.Name,
-		Url:       dbFeed.Url,
-		UserID:    dbFeed.UserID,
+		ID:            dbFeed.ID,
+		CreatedAt:     dbFeed.CreatedAt,
+		UpdatedAt:     dbFeed.UpdatedAt,
+		Name:          dbFeed.Name,
+		Url:           dbFeed.Url,
+		UserID:        dbFeed.UserID,
+		LastFetchedAt: &dbFeed.LastFetchedAt.Time,
 	}
 }
 
@@ -61,13 +55,21 @@ func databaseFeedsToFeeds(dbFeed []database.Feed) []Feed {
 	return feeds
 }
 
+type FeedFollow struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	UserID    uuid.UUID `json:"user_id"`
+	FeedID    uuid.UUID `json:"feed_id"`
+}
+
 func databaseFeedFollowToFeedFollow(dbFeedFollow database.FeedFollow) FeedFollow {
 	return FeedFollow{
-		ID: dbFeedFollow.ID,
+		ID:        dbFeedFollow.ID,
 		CreatedAt: dbFeedFollow.CreatedAt,
 		UpdatedAt: dbFeedFollow.UpdatedAt,
-		UserID: dbFeedFollow.UserID,
-		FeedID: dbFeedFollow.FeedID,
+		UserID:    dbFeedFollow.UserID,
+		FeedID:    dbFeedFollow.FeedID,
 	}
 }
 
